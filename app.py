@@ -1089,31 +1089,47 @@ AMARILLO = '#ffea00'
 NARANJA = '#ff6d00'
 
 
+def _evaluar_seguro(f_eval, x_vals, clip=1e10):
+    """
+    Evalua f(x) sobre un array, reemplazando infinitos/NaN con np.nan
+    para que Plotly no rompa la grafica al hacer pan lejos.
+    """
+    try:
+        y = f_eval(x_vals)
+        y = np.where(np.isfinite(y) & (np.abs(y) < clip), y, np.nan)
+    except Exception:
+        y = np.array([f_eval(xi) if np.isfinite(xi) else np.nan for xi in x_vals])
+        y = np.array([yi if (np.isfinite(yi) and abs(yi) < clip) else np.nan for yi in y])
+    return y
+
+
 def graficar_funcion_raiz(f_eval, raiz, a, b, titulo="f(x)", historial=None):
     """
-    Grafica f(x) en [a, b] y marca la raiz encontrada.
+    Grafica f(x) con datos pre-calculados en un rango 10x mas amplio
+    que el visible inicial. Al hacer pan la curva ya existe — no aparece
+    espacio en blanco.
 
     Parametros:
         f_eval (callable): Funcion evaluable f(x)
         raiz (float): Valor de la raiz encontrada
-        a, b (float): Rango de graficacion
+        a, b (float): Rango inicial visible
         titulo (str): Titulo del grafico
         historial (list): Lista de puntos intermedios (opcional)
 
     Retorna:
         plotly.graph_objects.Figure
     """
-    # Generar puntos para la curva
-    margen = (b - a) * 0.2
-    x_vals = np.linspace(a - margen, b + margen, 500)
-    try:
-        y_vals = f_eval(x_vals)
-    except Exception:
-        y_vals = np.array([f_eval(xi) for xi in x_vals])
+    span = b - a if b != a else 1.0
+    margen_vista = span * 0.2          # Vista inicial: [a-20%, b+20%]
+    extension    = span * 5.0          # Datos pre-calc: [a-500%, b+500%] => 10x rango
+
+    # 2000 puntos sobre el rango extendido — solo los visibles se renderizan
+    x_vals = np.linspace(a - extension, b + extension, 2000)
+    y_vals = _evaluar_seguro(f_eval, x_vals)
 
     fig = go.Figure()
 
-    # --- Curva de f(x) ---
+    # --- Curva de f(x) (rango completo pre-calculado) ---
     fig.add_trace(go.Scatter(
         x=x_vals, y=y_vals,
         mode='lines',
@@ -1137,7 +1153,6 @@ def graficar_funcion_raiz(f_eval, raiz, a, b, titulo="f(x)", historial=None):
 
     # --- Puntos intermedios del historial (convergencia) ---
     if historial:
-        # Mostrar los puntos c de biseccion o x_n de Newton
         x_hist = []
         y_hist = []
         for h in historial:
@@ -1162,13 +1177,22 @@ def graficar_funcion_raiz(f_eval, raiz, a, b, titulo="f(x)", historial=None):
                 hovertemplate='Iteracion<br>x = %{x:.6f}<br>f(x) = %{y:.6f}<extra></extra>'
             ))
 
+    layout_extra = dict(**LAYOUT_OSCURO)
+    layout_extra['xaxis'] = dict(
+        range=[a - margen_vista, b + margen_vista],  # Vista inicial
+        gridcolor='rgba(255,255,255,0.06)',
+        zerolinecolor='rgba(255,255,255,0.15)',
+        tickfont=dict(size=11)
+    )
+
     fig.update_layout(
         title=dict(text=titulo, font=dict(size=16)),
         xaxis_title="x",
         yaxis_title="f(x)",
         showlegend=True,
+        uirevision='funcion_raiz',   # Preserva zoom/pan en re-render de Streamlit
         legend=dict(bgcolor='rgba(0,0,0,0.5)', bordercolor='rgba(255,255,255,0.1)'),
-        **LAYOUT_OSCURO
+        **layout_extra
     )
 
     return fig
@@ -1208,6 +1232,7 @@ def graficar_convergencia(historial, key_error="error", titulo="Convergencia del
         xaxis_title="Iteracion",
         yaxis_title="Error",
         yaxis_type="log",
+        uirevision='convergencia',
         **LAYOUT_OSCURO
     )
 
@@ -1233,14 +1258,15 @@ def graficar_integracion(f_eval, x_puntos, y_puntos, metodo="Trapecio", a=None, 
     if b is None:
         b = x_puntos[-1]
 
+    span = b - a if b != a else 1.0
+    margen_vista = span * 0.1
+    extension    = span * 5.0   # Pre-calcular 10x el rango visible
+
     fig = go.Figure()
 
-    # --- Curva continua de f(x) ---
-    x_fino = np.linspace(a - (b - a) * 0.1, b + (b - a) * 0.1, 500)
-    try:
-        y_fino = f_eval(x_fino)
-    except Exception:
-        y_fino = np.array([f_eval(xi) for xi in x_fino])
+    # --- Curva continua de f(x) (rango extendido para pan infinito) ---
+    x_fino = np.linspace(a - extension, b + extension, 2000)
+    y_fino = _evaluar_seguro(f_eval, x_fino)
 
     fig.add_trace(go.Scatter(
         x=x_fino, y=y_fino,
@@ -1272,11 +1298,20 @@ def graficar_integracion(f_eval, x_puntos, y_puntos, metodo="Trapecio", a=None, 
         marker=dict(size=8, color=VERDE, line=dict(width=1, color='white'))
     ))
 
+    layout_integ = dict(**LAYOUT_OSCURO)
+    layout_integ['xaxis'] = dict(
+        range=[a - margen_vista, b + margen_vista],
+        gridcolor='rgba(255,255,255,0.06)',
+        zerolinecolor='rgba(255,255,255,0.15)',
+        tickfont=dict(size=11)
+    )
+
     fig.update_layout(
         title=dict(text=f"Integracion: {metodo}", font=dict(size=16)),
         xaxis_title="x",
         yaxis_title="f(x)",
-        **LAYOUT_OSCURO
+        uirevision='integracion',
+        **layout_integ
     )
 
     return fig
@@ -1316,6 +1351,7 @@ def graficar_edo(resultados, titulo="Solucion de la EDO"):
         xaxis_title="t",
         yaxis_title="y(t)",
         showlegend=True,
+        uirevision='edo',
         legend=dict(bgcolor='rgba(0,0,0,0.5)', bordercolor='rgba(255,255,255,0.1)'),
         **LAYOUT_OSCURO
     )
@@ -1385,19 +1421,22 @@ def graficar_interpolacion(xi, yi, funciones_eval, nombres, titulo="Interpolacio
 
     fig = go.Figure()
 
-    # Rango para graficar
+    # Rango extendido: 10x el rango de los puntos para pan continuo
     x_min, x_max = min(xi), max(xi)
-    margen = (x_max - x_min) * 0.15
-    x_fino = np.linspace(x_min - margen, x_max + margen, 500)
+    span = x_max - x_min if x_max != x_min else 1.0
+    margen_vista = span * 0.15
+    extension    = span * 5.0
+    x_fino = np.linspace(x_min - extension, x_max + extension, 2000)
 
     for idx, (f_eval, nombre) in enumerate(zip(funciones_eval, nombres)):
         color = colores[idx % len(colores)]
         try:
             y_fino = f_eval(x_fino)
             if isinstance(y_fino, (int, float)):
-                y_fino = np.full_like(x_fino, y_fino)
+                y_fino = np.full_like(x_fino, float(y_fino))
+            y_fino = np.where(np.isfinite(y_fino) & (np.abs(y_fino) < 1e10), y_fino, np.nan)
         except Exception:
-            y_fino = np.array([float(f_eval(xv)) for xv in x_fino])
+            y_fino = np.array([float(f_eval(xv)) if np.isfinite(f_eval(xv)) else np.nan for xv in x_fino])
 
         fig.add_trace(go.Scatter(
             x=x_fino, y=y_fino,
@@ -1416,13 +1455,22 @@ def graficar_interpolacion(xi, yi, funciones_eval, nombres, titulo="Interpolacio
         hovertemplate='(%{x:.4f}, %{y:.4f})<extra></extra>'
     ))
 
+    layout_interp = dict(**LAYOUT_OSCURO)
+    layout_interp['xaxis'] = dict(
+        range=[x_min - margen_vista, x_max + margen_vista],
+        gridcolor='rgba(255,255,255,0.06)',
+        zerolinecolor='rgba(255,255,255,0.15)',
+        tickfont=dict(size=11)
+    )
+
     fig.update_layout(
         title=dict(text=titulo, font=dict(size=16)),
         xaxis_title="x",
         yaxis_title="y",
         showlegend=True,
+        uirevision='interpolacion',
         legend=dict(bgcolor='rgba(0,0,0,0.5)'),
-        **LAYOUT_OSCURO
+        **layout_interp
     )
 
     return fig
