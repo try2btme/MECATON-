@@ -436,6 +436,44 @@ section[data-testid="stSidebar"] img {
 section[data-testid="stSidebar"] .stRadio [data-testid="stMarkdownContainer"] {
     font-size: 0.92rem !important;
 }
+
+/* --- BOTON PARA REABRIR SIDEBAR (cuando esta colapsado) ---
+   Sin esto, el boton queda invisible en tema oscuro y
+   el usuario no puede volver a abrir el sidebar. */
+[data-testid="stSidebarCollapsedControl"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: rgba(10, 10, 15, 0.97) !important;
+    border: 1px solid rgba(0, 229, 255, 0.25) !important;
+    border-left: none !important;
+    border-radius: 0 10px 10px 0 !important;
+    padding: 12px 6px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 3px 0 15px rgba(0, 229, 255, 0.08) !important;
+}
+
+[data-testid="stSidebarCollapsedControl"]:hover {
+    background: rgba(0, 229, 255, 0.12) !important;
+    border-color: rgba(0, 229, 255, 0.5) !important;
+    box-shadow: 3px 0 20px rgba(0, 229, 255, 0.2) !important;
+}
+
+/* Icono de flecha dentro del boton */
+[data-testid="stSidebarCollapsedControl"] svg {
+    fill: #00e5ff !important;
+    color: #00e5ff !important;
+}
+
+/* Boton de colapsar/expandir sidebar DENTRO del sidebar */
+[data-testid="stSidebar"] [data-testid="stBaseButton-header"] {
+    color: rgba(0, 229, 255, 0.6) !important;
+    transition: color 0.3s ease !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stBaseButton-header"]:hover {
+    color: #00e5ff !important;
+}
 """
 
 
