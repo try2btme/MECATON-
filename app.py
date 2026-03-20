@@ -4284,7 +4284,7 @@ st.set_page_config(
     page_title="Calculadora de Metodos Numericos | UNITEC",
     page_icon="assets/unitec_color.png",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ============================================================
@@ -4316,98 +4316,94 @@ st.markdown("""
 # ============================================================
 # BOTON FLOTANTE PARA ABRIR SIDEBAR
 # ============================================================
-# Este boton SIEMPRE esta visible en la esquina superior izquierda.
-# Usa JavaScript para abrir el sidebar programaticamente.
-st.markdown("""
+# st.markdown NO ejecuta <script>. Usamos st.components.v1.html()
+# que corre en un iframe con acceso a window.parent.document
+import streamlit.components.v1 as components
+
+components.html("""
 <style>
-    /* --- Boton flotante personalizado para abrir sidebar --- */
-    #sidebar-toggle-btn {
+    body { margin: 0; background: transparent; overflow: hidden; }
+    #menubtn {
         position: fixed;
-        top: 14px;
-        left: 14px;
-        z-index: 999999;
-        width: 40px;
-        height: 40px;
+        top: 6px;
+        left: 6px;
+        width: 42px;
+        height: 42px;
         border-radius: 10px;
-        border: 1px solid rgba(0, 229, 255, 0.35);
-        background: rgba(10, 10, 20, 0.92);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(0,229,255,0.35);
+        background: rgba(10,10,20,0.95);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all 0.3s ease;
-        box-shadow: 0 0 15px rgba(0, 229, 255, 0.12);
+        box-shadow: 0 0 15px rgba(0,229,255,0.15);
     }
-    #sidebar-toggle-btn:hover {
-        background: rgba(0, 229, 255, 0.15);
-        border-color: rgba(0, 229, 255, 0.6);
-        box-shadow: 0 0 25px rgba(0, 229, 255, 0.3);
-        transform: scale(1.08);
+    #menubtn:hover {
+        background: rgba(0,229,255,0.18);
+        border-color: #00e5ff;
+        box-shadow: 0 0 25px rgba(0,229,255,0.35);
+        transform: scale(1.1);
     }
-    #sidebar-toggle-btn svg {
-        fill: #00e5ff;
-        width: 20px;
-        height: 20px;
-    }
-
-    /* Cuando el sidebar esta abierto, mover el boton para no estorbar */
-    [data-testid="stSidebar"][aria-expanded="true"] ~ section #sidebar-toggle-btn {
-        opacity: 0;
-        pointer-events: none;
-    }
+    #menubtn svg { fill: #00e5ff; width: 22px; height: 22px; }
 </style>
-
-<div id="sidebar-toggle-btn" title="Abrir menu de navegacion">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-    </svg>
+<div id="menubtn" title="Abrir menu">
+    <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
 </div>
-
 <script>
-document.getElementById('sidebar-toggle-btn').addEventListener('click', function() {
-    // Estrategia 1: Click en el boton nativo de colapso/expansion
-    var nativeBtn = document.querySelector('[data-testid="collapsedControl"] button')
-        || document.querySelector('[data-testid="stSidebarCollapsedControl"] button')
-        || document.querySelector('button[data-testid="baseButton-header"]');
+document.getElementById('menubtn').addEventListener('click', function(){
+    var doc = window.parent.document;
 
-    if (nativeBtn) {
-        nativeBtn.click();
-        return;
+    // Intento 1: Click en el boton nativo de expandir sidebar
+    var selectors = [
+        '[data-testid="collapsedControl"] button',
+        '[data-testid="stSidebarCollapsedControl"] button',
+        'button[data-testid="baseButton-header"]',
+        '[data-testid="collapsedControl"]',
+        '[data-testid="stSidebarCollapsedControl"]'
+    ];
+    for (var i = 0; i < selectors.length; i++) {
+        var el = doc.querySelector(selectors[i]);
+        if (el) { el.click(); return; }
     }
 
-    // Estrategia 2: Buscar CUALQUIER boton dentro del collapsed control
-    var collapsed = document.querySelector('[data-testid="collapsedControl"]')
-        || document.querySelector('[data-testid="stSidebarCollapsedControl"]');
-    if (collapsed) {
-        var b = collapsed.querySelector('button') || collapsed;
-        b.click();
-        return;
-    }
-
-    // Estrategia 3: Fuerza bruta - encontrar el sidebar y manipularlo
-    var sidebar = document.querySelector('[data-testid="stSidebar"]');
-    if (sidebar) {
-        sidebar.setAttribute('aria-expanded', 'true');
-        sidebar.style.transform = 'none';
-        sidebar.style.left = '0px';
-        sidebar.style.visibility = 'visible';
-        sidebar.style.width = '21rem';
-    }
-
-    // Estrategia 4: Buscar todos los botones con SVG de flecha
-    var allButtons = document.querySelectorAll('button');
-    for (var i = 0; i < allButtons.length; i++) {
-        var parent = allButtons[i].parentElement;
-        if (parent && (parent.getAttribute('data-testid') || '').toLowerCase().includes('collapse')) {
-            allButtons[i].click();
+    // Intento 2: Buscar cualquier boton con aria-label que diga expand/sidebar
+    var btns = doc.querySelectorAll('button');
+    for (var j = 0; j < btns.length; j++) {
+        var lbl = (btns[j].getAttribute('aria-label') || '').toLowerCase();
+        var tid = (btns[j].getAttribute('data-testid') || '').toLowerCase();
+        var ptid = (btns[j].parentElement.getAttribute('data-testid') || '').toLowerCase();
+        if (lbl.includes('expand') || lbl.includes('sidebar') || lbl.includes('open') ||
+            tid.includes('header') || ptid.includes('collapse')) {
+            btns[j].click();
             return;
         }
     }
+
+    // Intento 3: Manipulacion directa del DOM del sidebar
+    var sidebar = doc.querySelector('[data-testid="stSidebar"]');
+    if (sidebar) {
+        sidebar.setAttribute('aria-expanded', 'true');
+        sidebar.style.cssText = 'transform:none!important;left:0!important;visibility:visible!important;width:21rem!important;min-width:21rem!important;';
+        // Ocultar este boton brevemente
+        document.getElementById('menubtn').style.opacity = '0';
+        setTimeout(function(){ document.getElementById('menubtn').style.opacity = '1'; }, 500);
+    }
 });
+
+// Auto-ocultar cuando sidebar esta abierto
+setInterval(function(){
+    var doc = window.parent.document;
+    var sidebar = doc.querySelector('[data-testid="stSidebar"]');
+    var btn = document.getElementById('menubtn');
+    if (sidebar && btn) {
+        var expanded = sidebar.getAttribute('aria-expanded') === 'true';
+        btn.style.opacity = expanded ? '0' : '1';
+        btn.style.pointerEvents = expanded ? 'none' : 'auto';
+    }
+}, 300);
 </script>
-""", unsafe_allow_html=True)
+""", height=50)
 
 # ============================================================
 # SIDEBAR: PANEL DE NAVEGACION LATERAL
