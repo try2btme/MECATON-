@@ -4359,29 +4359,54 @@ st.markdown("""
     }
 </style>
 
-<button id="sidebar-toggle-btn" onclick="
-    // Buscar el boton nativo de Streamlit para expandir sidebar
-    var btn = document.querySelector('[data-testid=\\'stSidebarCollapsedControl\\'] button')
-              || document.querySelector('[data-testid=\\'stSidebarCollapsedControl\\']')
-              || document.querySelector('button[kind=\\'header\\']');
-    if (btn) {
-        btn.click();
-    } else {
-        // Fallback: buscar cualquier boton en el header area
-        var allBtns = document.querySelectorAll('button');
-        for (var i = 0; i < allBtns.length; i++) {
-            if (allBtns[i].closest('[data-testid=\\'stSidebarCollapsedControl\\']') ||
-                allBtns[i].getAttribute('kind') === 'header') {
-                allBtns[i].click();
-                break;
-            }
-        }
-    }
-" title="Abrir menu de navegacion">
+<div id="sidebar-toggle-btn" title="Abrir menu de navegacion">
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
     </svg>
-</button>
+</div>
+
+<script>
+document.getElementById('sidebar-toggle-btn').addEventListener('click', function() {
+    // Estrategia 1: Click en el boton nativo de colapso/expansion
+    var nativeBtn = document.querySelector('[data-testid="collapsedControl"] button')
+        || document.querySelector('[data-testid="stSidebarCollapsedControl"] button')
+        || document.querySelector('button[data-testid="baseButton-header"]');
+
+    if (nativeBtn) {
+        nativeBtn.click();
+        return;
+    }
+
+    // Estrategia 2: Buscar CUALQUIER boton dentro del collapsed control
+    var collapsed = document.querySelector('[data-testid="collapsedControl"]')
+        || document.querySelector('[data-testid="stSidebarCollapsedControl"]');
+    if (collapsed) {
+        var b = collapsed.querySelector('button') || collapsed;
+        b.click();
+        return;
+    }
+
+    // Estrategia 3: Fuerza bruta - encontrar el sidebar y manipularlo
+    var sidebar = document.querySelector('[data-testid="stSidebar"]');
+    if (sidebar) {
+        sidebar.setAttribute('aria-expanded', 'true');
+        sidebar.style.transform = 'none';
+        sidebar.style.left = '0px';
+        sidebar.style.visibility = 'visible';
+        sidebar.style.width = '21rem';
+    }
+
+    // Estrategia 4: Buscar todos los botones con SVG de flecha
+    var allButtons = document.querySelectorAll('button');
+    for (var i = 0; i < allButtons.length; i++) {
+        var parent = allButtons[i].parentElement;
+        if (parent && (parent.getAttribute('data-testid') || '').toLowerCase().includes('collapse')) {
+            allButtons[i].click();
+            return;
+        }
+    }
+});
+</script>
 """, unsafe_allow_html=True)
 
 # ============================================================
