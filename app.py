@@ -64,23 +64,7 @@ import tempfile
 from fpdf import FPDF
 from datetime import datetime
 
-# Configurar tema oscuro forzado
-st.set_page_config(
-    page_title="Calculadora de Métodos Numéricos | MECATON 2026",
-    page_icon="🔢",
-    layout="wide",
-    initial_sidebar_state="expanded",
-    menu_items={"Get help": None, "Report a bug": None, "About": None}
-)
-
-# Forzar tema oscuro
-st.markdown("""
-<script>
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-    window.location.href = window.location.href;
-}
-</script>
-""", unsafe_allow_html=True)
+# NOTA: st.set_page_config() se llama una sola vez en SECCION 19 (final del archivo).
 
 # ══════════════════════════════════════════════════════════════════
 # SECCION 2: CSS GLOBAL (GLASSMORPHISM)
@@ -4311,13 +4295,93 @@ st.markdown(f"<style>{CSS_GLOBAL}</style>", unsafe_allow_html=True)
 # ============================================================
 # OCULTAR ELEMENTOS DEFAULT DE STREAMLIT
 # ============================================================
+# NOTA: NO ocultar 'header' — contiene el boton para abrir/cerrar sidebar
 st.markdown("""
 <style>
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
     [data-testid="stSidebarNav"] {display: none !important;}
+
+    /* Ocultar branding de Streamlit en el header, pero mantener
+       los botones de control (sidebar toggle, etc.) */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+    }
+    header [data-testid="stToolbar"] {
+        display: none !important;
+    }
 </style>
+""", unsafe_allow_html=True)
+
+# ============================================================
+# BOTON FLOTANTE PARA ABRIR SIDEBAR
+# ============================================================
+# Este boton SIEMPRE esta visible en la esquina superior izquierda.
+# Usa JavaScript para abrir el sidebar programaticamente.
+st.markdown("""
+<style>
+    /* --- Boton flotante personalizado para abrir sidebar --- */
+    #sidebar-toggle-btn {
+        position: fixed;
+        top: 14px;
+        left: 14px;
+        z-index: 999999;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 229, 255, 0.35);
+        background: rgba(10, 10, 20, 0.92);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(0, 229, 255, 0.12);
+    }
+    #sidebar-toggle-btn:hover {
+        background: rgba(0, 229, 255, 0.15);
+        border-color: rgba(0, 229, 255, 0.6);
+        box-shadow: 0 0 25px rgba(0, 229, 255, 0.3);
+        transform: scale(1.08);
+    }
+    #sidebar-toggle-btn svg {
+        fill: #00e5ff;
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Cuando el sidebar esta abierto, mover el boton para no estorbar */
+    [data-testid="stSidebar"][aria-expanded="true"] ~ section #sidebar-toggle-btn {
+        opacity: 0;
+        pointer-events: none;
+    }
+</style>
+
+<button id="sidebar-toggle-btn" onclick="
+    // Buscar el boton nativo de Streamlit para expandir sidebar
+    var btn = document.querySelector('[data-testid=\\'stSidebarCollapsedControl\\'] button')
+              || document.querySelector('[data-testid=\\'stSidebarCollapsedControl\\']')
+              || document.querySelector('button[kind=\\'header\\']');
+    if (btn) {
+        btn.click();
+    } else {
+        // Fallback: buscar cualquier boton en el header area
+        var allBtns = document.querySelectorAll('button');
+        for (var i = 0; i < allBtns.length; i++) {
+            if (allBtns[i].closest('[data-testid=\\'stSidebarCollapsedControl\\']') ||
+                allBtns[i].getAttribute('kind') === 'header') {
+                allBtns[i].click();
+                break;
+            }
+        }
+    }
+" title="Abrir menu de navegacion">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+    </svg>
+</button>
 """, unsafe_allow_html=True)
 
 # ============================================================
