@@ -1,0 +1,123 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║               📱 CÓMO GENERAR EL QR PARA TUS COMPAÑERAS                      ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+⚠️ IMPORTANTE: Primero debes tener la app en internet (Streamlit Cloud)
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+OPCIÓN 1: GENERADOR WEB (sin instalar nada) ⭐ MÁS FÁCIL
+─────────────────────────────────────────────────────────────────────────
+
+1. Ve a: https://www.qr-code-generator.com
+
+2. En el campo "Enter text", pega tu URL:
+   Ejemplo: https://mecaton-2026.streamlit.app
+
+3. El QR se genera automáticamente
+
+4. Haz clic en "Download" → Descarga como PNG
+
+5. ¡Listo! Ya tienes tu QR para compartir
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+OPCIÓN 2: SCRIPT PYTHON (si tienes Python instalado)
+─────────────────────────────────────────────────────────────────────────
+
+1. Abre PowerShell en esta carpeta
+
+2. Instala qrcode:
+   pip install qrcode[pil]
+
+3. Ejecuta el script:
+   python generar_qr.py
+
+4. Te pide que pegues la URL de Streamlit Cloud
+
+5. Se genera: QR_CALCULADORA_MECATON.png
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+OPCIÓN 3: OTRAS HERRAMIENTAS
+─────────────────────────────────────────────────────────────────────────
+
+Alternativas rápidas:
+
+• qrcode.tec-it.com
+• goqr.me
+• qr.io
+• qr-server.com
+
+Todas funcionan igual: pegas URL → descargas PNG
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+🤔 ¿CUÁL ES MI URL DE STREAMLIT CLOUD?
+─────────────────────────────────────────────────────────────────────────
+
+Cuando despliegas en Streamlit Cloud, te da una URL así:
+
+   https://mecaton-2026.streamlit.app
+
+(Verás esta URL en el navegador cuando la app se abre)
+
+ESA es la URL que tienes que codificar en el QR.
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+✅ DESPUÉS DE GENERAR EL QR
+─────────────────────────────────────────────────────────────────────────
+
+1. ✓ Guarda la imagen PNG en tu computadora
+2. ✓ Imprime el QR (tamaño A4 funciona bien)
+3. ✓ Colócalo en lugar visible durante la presentación
+4. ✓ Tus compañeras lo escanean con el teléfono
+5. ✓ ¡Se abre la app automáticamente!
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+💡 TIPS
+──────────────────────────────────────────────────────────────────────────
+
+✓ El QR es solo una URL encriptada (no guarda datos)
+✓ El mismo QR funciona para todos (múltiples usuarios simultáneamente)
+✓ Si cambias el código en GitHub, la URL del QR sigue siendo la misma
+✓ Puedes imprimir el QR o mostrarlo en pantalla
+✓ El QR es válido mientras Streamlit Cloud esté activo
+
+
+═════════════════════════════════════════════════════════════════════════════
+
+
+🚨 TROUBLESHOOTING
+──────────────────────────────────────────────────────────────────────────
+
+"No funciona el QR"
+→ Verifica que la URL sea correcta
+→ Prueba manualmente: abre la URL en un navegador
+→ Verifica que Streamlit Cloud esté activo (tarda unos segundos en iniciarse)
+
+"El QR se ve borroso"
+→ Genera con mejor tamaño/resolución
+→ Intenta con otro generador
+
+"Quiero cambiar la URL del QR"
+→ Genera un nuevo QR con la nueva URL
+→ El anterior deja de funcionar
+
+
+════════════════════════════════════════════════════════════════════════════════
+
+¿Preguntas? Revisa: SETUP_STREAMLIT_CLOUD.md

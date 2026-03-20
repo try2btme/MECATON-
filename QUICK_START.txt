@@ -1,0 +1,64 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║          🔢 CALCULADORA DE MÉTODOS NUMÉRICOS - MECATON 2026                 ║
+║                                                                              ║
+║  OPCIÓN 1: Ejecutar LOCAL (solo tú)                                        ║
+║  ────────────────────────────────────────────────────────────────────────  ║
+║  1. Abre PowerShell en esta carpeta                                        ║
+║  2. Ejecuta: pip install -r requirements.txt                               ║
+║  3. Ejecuta: streamlit run app.py                                          ║
+║  4. Se abre automáticamente en http://localhost:8501                       ║
+║                                                                              ║
+║                                                                              ║
+║  OPCIÓN 2: Desplegar en INTERNET (todos pueden acceder)                    ║
+║  ────────────────────────────────────────────────────────────────────────  ║
+║  Lee: SETUP_STREAMLIT_CLOUD.md                                             ║
+║                                                                              ║
+║  Resumen rápido:                                                            ║
+║  1. Crea repo vacío en github.com/new                                       ║
+║  2. Abre PowerShell aquí y ejecuta:                                         ║
+║     git init                                                                ║
+║     git add .                                                               ║
+║     git commit -m "MECATON 2026"                                            ║
+║     git branch -M main                                                      ║
+║     git remote add origin [PEGA_URL_DEL_REPO]                               ║
+║     git push -u origin main                                                 ║
+║  3. Ve a share.streamlit.io y conecta tu GitHub                            ║
+║  4. ¡Tu app está en internet con URL pública!                              ║
+║  5. Genera un QR de esa URL                                                ║
+║  6. Comparte el QR con tus compañeras                                       ║
+║                                                                              ║
+║                                                                              ║
+║  📁 ARCHIVOS IMPORTANTES                                                    ║
+║  ────────────────────────────────────────────────────────────────────────  ║
+║  ✓ app.py              - TODO el código (4,277 líneas, 19 secciones)       ║
+║  ✓ requirements.txt    - Dependencias Python                               ║
+║  ✓ assets/             - Logos UNITEC (blanco y color)                     ║
+║  ✓ README.md           - Descripción general                               ║
+║  ✓ SETUP_STREAMLIT_CLOUD.md - Guía paso a paso                            ║
+║                                                                              ║
+║                                                                              ║
+║  🎓 PARA PRESENTACIÓN EN VSCODE                                             ║
+║  ────────────────────────────────────────────────────────────────────────  ║
+║  1. Abre app.py en VS Code                                                  ║
+║  2. Usa Ctrl+G para ir a líneas de cada sección:                           ║
+║     - Línea 52: SECCION 1 - IMPORTS GLOBALES                               ║
+║     - Línea 69: SECCION 2 - CSS GLOBAL                                     ║
+║     - Línea 426: SECCION 3 - PARSER DE EXPRESIONES                         ║
+║     - Línea 528: SECCION 4 - VALIDACION                                    ║
+║     - Línea 720: SECCION 5 - REPORTES PDF                                  ║
+║     - ... (todas las 19 secciones están claramente marcadas)               ║
+║  3. Muestra cada sección a tus profesores                                   ║
+║                                                                              ║
+║                                                                              ║
+║  📌 NOTAS                                                                    ║
+║  ────────────────────────────────────────────────────────────────────────  ║
+║  • Dark mode forzado (se ve oscuro siempre)                                 ║
+║  • Cada sección tiene banners claros (# SECCION X:)                        ║
+║  • Código organizado en 19 secciones lógicas                               ║
+║  • 62 funciones, todos los métodos numéricos incluidos                      ║
+║  • Funciona en teléfono, laptop, tablet (cualquier navegador)              ║
+║  • Streamlit Cloud es GRATUITO y 24/7                                      ║
+║                                                                              ║
+║  ¿Preguntas? Lee los archivos .md en esta carpeta                          ║
+║                                                                              ║
+╚════════════════════════════════════════════════════════════════════════════╝
